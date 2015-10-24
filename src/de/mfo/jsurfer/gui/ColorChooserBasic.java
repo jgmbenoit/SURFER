@@ -17,7 +17,7 @@ import javax.swing.*;
 public class ColorChooserBasic extends ColorPicker {
   public ColorChooserBasic(int a, int b)//:ColorPicker(false)
     {
-      super(false);
+      super(false,false);
       setPreferredSize( new Dimension( a, b ) );
         for( Component c : getComponents() )
             if( c instanceof JComponent )
