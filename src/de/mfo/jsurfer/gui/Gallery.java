@@ -36,6 +36,18 @@ public class Gallery {
     BufferedImage description;
     GalleryItem[] gallery_items;
 
+		private static String numericXMLStringToCharString(String numericXMLString)
+		{
+			StringBuffer charStringBuffer = new StringBuffer();
+			for (String item : (numericXMLString.replace("&#","")).split(";"))
+			{
+    		charStringBuffer.append(String.format("%c",Integer.parseInt(item)));
+			}
+		return charStringBuffer.toString();
+		}
+
+
+
     public static int getNumberOfGalleries() throws IOException
     {
         return getNumberOfGalleries(Locale.getDefault());
@@ -64,7 +76,7 @@ public class Gallery {
         try
         {
             System.err.print( "loading " + pdfURL);
-            pdfDecoder.openPdfFileFromURL( pdfURL, true );            
+            pdfDecoder.openPdfFileFromURL( pdfURL, true );
         }
         catch( PdfException pdfe )
         {
@@ -78,6 +90,7 @@ public class Gallery {
         OutlineEntry introEntry = outlineEntries.remove(0);
         this.name = introEntry.name.trim();
         this.iconURL = getResource( "/de/mfo/jsurfer/gallery/" + introEntry.filename_prefix + "_icon.png" );
+
 
         LinkedList< GalleryItem > l = new LinkedList< GalleryItem >();
         for( OutlineEntry entry : outlineEntries )
@@ -101,17 +114,16 @@ public class Gallery {
 
     private List< OutlineEntry > readGalleryOutline()
     {
-        LinkedList< OutlineEntry > entries = new LinkedList< OutlineEntry >();  
+        LinkedList< OutlineEntry > entries = new LinkedList< OutlineEntry >();
         Node rootNode = pdfDecoder.getOutlineAsXML().getFirstChild();
 
         NodeList children = rootNode.getChildNodes();
         for( int i = 0; i < children.getLength(); i++ )
         {
             Element currentElement = (Element) children.item(i);
-
             entries.add( new OutlineEntry(
                 currentElement.getAttribute("title"),
-                ( (Element) currentElement.getFirstChild() ).getAttribute( "title" ),
+                numericXMLStringToCharString( ( (Element) currentElement.getFirstChild() ).getAttribute( "title" ) ),
                 Integer.parseInt( currentElement.getAttribute("page") )
                 ) );
         }
@@ -176,7 +188,7 @@ public class Gallery {
     {
         try
         {
-            // ToDo: scale appropriately 
+            // ToDo: scale appropriately
             return pdfDecoder.getPageAsImage( pageNum );
         }
         catch( Exception e )
